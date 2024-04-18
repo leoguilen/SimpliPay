@@ -1,0 +1,59 @@
+{
+	"name": "Ubuntu",
+	"image": "mcr.microsoft.com/devcontainers/base:jammy",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
+		"ghcr.io/devcontainers/features/dotnet:2": {},
+		"ghcr.io/devcontainers/features/github-cli": {},
+		"ghcr.io/devcontainers/features/common-utils": {
+			"installZsh": true,
+			"installOhMyZsh": true,
+			"installOhMyZshConfig": true,
+			"configureZshAsDefaultShell": true,
+			"upgradePackages": true,
+			"username": "vscode",
+			"userUid": 1000,
+			"userGid": 1000
+		}
+	},
+	"overrideFeatureInstallOrder": [
+		"ghcr.io/devcontainers/features/common-utils",
+		"ghcr.io/devcontainers/features/docker-in-docker:2",
+		"ghcr.io/devcontainers/features/dotnet:2"
+	],
+	"onCreateCommand": "/bin/bash ./.devcontainer/on-create.sh > ~/on-create.log",
+	"postStartCommand": "/bin/bash ./.devcontainer/post-start.sh > ~/post-start.log",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-dotnettools.csdevkit",
+				"ms-azuretools.vscode-docker",
+				"GitHub.copilot",
+				"EditorConfig.EditorConfig",
+				"humao.rest-client",
+				"redhat.vscode-yaml"
+			],
+			"settings": {
+				"terminal.integrated.shell.linux": "/usr/bin/zsh",
+				"terminal.integrated.shellArgs.linux": [
+					"-l"
+				],
+				"editor.defaultFormatter": "ms-dotnettools.csharp",
+				"editor.formatOnSave": true,
+				"editor.codeActionsOnSave": {
+					"source.organizeImports": "always",
+					"source.fixAll": "always"
+				},
+				"editor.formatOnType": true,
+				"editor.formatOnPaste": true,
+				"editor.formatOnSaveMode": "file"
+			}
+		}
+	},
+	"hostRequirements": {
+		"memory": "4gb",
+		"cpus": 2,
+		"storage": "5gb"
+	},
+	"remoteUser": "vscode"
+}

@@ -1,0 +1,31 @@
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres_data:
+
+
+services:
+  postgres:
+    build:
+      context: ./postgres
+      dockerfile: ./Dockerfile
+      no_cache: true
+    container_name: postgres
+    hostname: postgres
+    restart: on-failure
+    stop_grace_period: 30s
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5

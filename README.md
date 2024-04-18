@@ -1,0 +1,2 @@
+# SimpliPay 💳💸
+SimpliPay is a simplified payment service provider (PSP) that facilitates electronic payment transactions between various parties, such as customers, companies and banks. It provides credit card and debit card payments.
