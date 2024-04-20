@@ -31,7 +31,9 @@
 				"GitHub.copilot",
 				"EditorConfig.EditorConfig",
 				"humao.rest-client",
-				"redhat.vscode-yaml"
+				"redhat.vscode-yaml",
+				"hediet.vscode-drawio",
+				"rangav.vscode-thunder-client"
 			],
 			"settings": {
 				"terminal.integrated.shell.linux": "/usr/bin/zsh",
