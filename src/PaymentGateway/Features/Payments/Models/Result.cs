@@ -11,11 +11,13 @@ public record Result(bool IsSuccess, string? ErrorMessage, Exception? Exception 
     public static implicit operator bool(Result result) => result.IsSuccess;
 }
 
-public record Result<T>(bool IsSuccess, string? ErrorMessage, T? Value)
+public record Result<T>(bool IsSuccess, string? ErrorMessage, T? Value, Exception? Exception = null)
 {
     public static Result<T> Success(T value) => new(true, null, value);
 
     public static Result<T> Failure(string errorMessage) => new(false, errorMessage, default);
+
+    public static Result<T> Failure(Exception? exception) => new(false, exception?.Message, default, exception);
 
     public static implicit operator bool(Result<T> result) => result.IsSuccess;
 }

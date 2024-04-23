@@ -22,7 +22,7 @@ internal class PaymentRequestFixture : Fixture
                 _faker.Finance.CreditCardCvv()))
             .With(x => x.PaymentMethod, _faker.PickRandom<PaymentMethod>())
             .With(x => x.Description, _faker.Lorem.Sentence())
-            .With(x => x.Date, DateTimeOffset.UtcNow)
+            .With(x => x.Date, DateTimeOffset.UtcNow.Date)
             .Create();
     }
 

@@ -1,4 +1,4 @@
-﻿namespace PaymentGateway.Enums;
+﻿namespace PaymentGateway.Features.Payments.Enums;
 
 public enum PaymentMethod : byte
 {

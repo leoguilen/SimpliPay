@@ -15,4 +15,8 @@ public record Payment
     public required string Description { get; init; }
 
     public required DateTimeOffset Date { get; init; }
+
+    public PaymentStatus Status { get; init; }
+
+    public Client? Client { get; init; }
 }

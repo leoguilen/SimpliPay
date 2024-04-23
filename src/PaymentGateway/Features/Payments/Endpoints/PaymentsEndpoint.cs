@@ -20,39 +20,69 @@ public static class PaymentsEndpoint
                 var result = await paymentService.ExecuteAsync(request, cancellationToken);
                 if (!result.IsSuccess)
                 {
-                    var problemDetails = new ProblemDetails()
-                    {
-                        Title = "Payment request failed",
-                        Status = StatusCodes.Status422UnprocessableEntity,
-                        Detail = result.ErrorMessage,
-                        Instance = httpContext.Request.Path,
-                        Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.21",
-                    };
-                    return Results.UnprocessableEntity(problemDetails);
+                    return Results.Problem(result.ToProblemDetails(httpContext));
                 }
 
                 return Results.Accepted(
                     uri: $"/api/v1/payments/{result!.Value!.Id}",
-                    value: PaymentResponse.FromPayment(result!.Value!));
+                    value: PaymentStatusResponse.FromPayment(result!.Value!));
             })
             .Accepts<PaymentRequest>("application/json")
-            .Produces<PaymentResponse>(StatusCodes.Status202Accepted, MediaTypeNames.Application.Json)
+            .Produces<PaymentStatusResponse>(StatusCodes.Status202Accepted, MediaTypeNames.Application.Json)
             .Produces(StatusCodes.Status422UnprocessableEntity)
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status500InternalServerError)
             .ProducesProblem(StatusCodes.Status503ServiceUnavailable)
             .WithName("CreatePayment")
             .WithSummary("Create a new payment")
-            .WithDescription("Create a new payment")
             .WithTags("Payments")
             .WithOpenApi();
 
-        // Get payment by id
+        endpoints.MapGet("/payments/{id}", async (
+            [FromRoute] Guid id,
+            [FromServices] ITransactionsRepository repository,
+            CancellationToken cancellationToken) =>
+            {
+                var payment = await repository.GetByIdAsync(id, cancellationToken);
+                return payment is null
+                    ? Results.NotFound()
+                    : Results.Ok(PaymentResponse.FromPayment(payment));
+            })
+            .Produces<PaymentResponse>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
+            .Produces(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status500InternalServerError)
+            .ProducesProblem(StatusCodes.Status503ServiceUnavailable)
+            .WithName("GetPayment")
+            .WithSummary("Get payment details")
+            .WithTags("Payments")
+            .WithOpenApi();
 
-        // Cancel payment by id
+        endpoints.MapGet("/payments", async (
+            [FromQuery] PaymentStatus? status,
+            [FromQuery] DateTime? from,
+            [FromQuery] DateTime? to,
+            [FromServices] ITransactionsRepository repository,
+            CancellationToken cancellationToken) =>
+            {
+                var filter = new PaymentFilter
+                {
+                    Status = status,
+                    From = from,
+                    To = to
+                };
 
-        // Refund payment by id
+                var payments = await repository.GetAllAsync(filter, cancellationToken);
 
-        // Get refund by id
+                return Results.Ok(payments.Select(PaymentResponse.FromPayment));
+            })
+            .Produces<IEnumerable<PaymentResponse>>(StatusCodes.Status200OK, MediaTypeNames.Application.Json)
+            .Produces(StatusCodes.Status500InternalServerError)
+            .ProducesProblem(StatusCodes.Status503ServiceUnavailable)
+            .WithName("GetPayments")
+            .WithSummary("Get all payments")
+            .WithTags("Payments")
+            .WithOpenApi();
+
+        // Get client balance (payables)
     }
 }

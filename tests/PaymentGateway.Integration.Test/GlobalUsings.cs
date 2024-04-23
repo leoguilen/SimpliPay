@@ -14,6 +14,7 @@ global using FluentAssertions;
 
 global using PaymentGateway.Features.Payments.Endpoints.Contracts.Requests;
 global using PaymentGateway.Integration.Test.Fixtures;
+global using PaymentGateway.Features.Payments.Endpoints.Contracts.Responses;
 
 global using Microsoft.Extensions.Configuration;
 
@@ -24,4 +25,6 @@ global using Testcontainers.PostgreSql;
 
 global using Bogus;
 
-global using PaymentGateway.Enums;
+global using PaymentGateway.Features.Payments.Enums;
+global using PaymentGateway.Features.Balances.Endpoints.Contracts.Responses;
+global using PaymentGateway.Features.Balances.Enums;

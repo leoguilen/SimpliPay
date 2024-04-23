@@ -25,7 +25,7 @@ internal sealed class PaymentService(
         if (!result.IsSuccess)
         {
             logger.LogError(result.Exception, "Failed to save payment {PaymentId} to the database", payment.Id);
-            return Result<Payment>.Failure(result.ErrorMessage!);
+            return Result<Payment>.Failure(result.Exception!);
         }
 
         var protector = dataProtectionProvider.CreateProtector($"Payment:{payment.Id}");

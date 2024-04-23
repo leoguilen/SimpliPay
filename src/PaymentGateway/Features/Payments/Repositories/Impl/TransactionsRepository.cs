@@ -41,4 +41,42 @@ internal sealed class TransactionsRepository(
             return Result.Failure(ex);
         }
     }
+
+    public async Task<IEnumerable<Payment>> GetAllAsync(
+        PaymentFilter filter,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new CommandDefinition(
+            commandText: SqlStatements.GetTransactions,
+            parameters: new
+            {
+                filter.Status,
+                From = filter.From ?? DateTime.Today.AddDays(-1),
+                To = filter.To ?? DateTime.Today.AddDays(1).AddSeconds(-1),
+                clientContext.ClientId
+            },
+            cancellationToken: cancellationToken
+        );
+
+        var resultSet = await connection.QueryAsync<PaymentResultSet>(query);
+
+        return !resultSet.Any()
+            ? []
+            : resultSet.Select(x => x.ToPayment()!);
+    }
+
+    public async Task<Payment?> GetByIdAsync(
+        Guid paymentId,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new CommandDefinition(
+            commandText: SqlStatements.GetTransactionById,
+            parameters: new { paymentId, clientContext.ClientId },
+            cancellationToken: cancellationToken
+        );
+
+        var resultSet = await connection.QueryFirstOrDefaultAsync<PaymentResultSet?>(query);
+
+        return resultSet?.ToPayment();
+    }
 }

@@ -3,7 +3,7 @@
 [Trait("Category", "Unit")]
 public class PaymentServiceTest
 {
-    private static readonly Fixture _fixture = new();
+    private static readonly PaymentFixture _fixture = new();
 
     private readonly Mock<IPaymentRiskCheckService> _riskCheckServiceMock;
     private readonly Mock<IDataProtector> _dataProtectorMock;
@@ -26,9 +26,7 @@ public class PaymentServiceTest
     public async Task ExecuteAsync_WhenRiskCheckFails_ShouldReturnFailureResult()
     {
         // Arrange
-        var payment = _fixture.Build<Payment>()
-            .Without(x => x.Card)
-            .Create();
+        var payment = _fixture.CreateSuspiciousPayment();
         var cancellationToken = new CancellationToken();
         _riskCheckServiceMock
             .Setup(x => x.CheckAsync(payment, cancellationToken))
@@ -46,41 +44,34 @@ public class PaymentServiceTest
     public async Task ExecuteAsync_WhenTransactionRepositoryFails_ShouldReturnFailureResult()
     {
         // Arrange
-        var payment = _fixture.Build<Payment>()
-            .Without(x => x.Card)
-            .Create();
+        var payment = _fixture.CreateValidPayment();
         var cancellationToken = new CancellationToken();
         _riskCheckServiceMock
             .Setup(x => x.CheckAsync(payment, cancellationToken))
             .ReturnsAsync(Result.Success());
-        _dataProtectionProviderMock
-            .Setup(x => x.CreateProtector($"Payment:{payment.Id}"))
-            .Returns(_dataProtectorMock.Object);
-        _dataProtectorMock
-            .Setup(x => x.Protect(It.IsAny<byte[]>()))
-            .Returns(Encoding.UTF8.GetBytes("encryptedPayment"));
         _transactionsRepositoryMock
             .Setup(x => x.AddAsync(payment, cancellationToken))
-            .ReturnsAsync(Result.Failure("Failed to save payment to the database"));
+            .ReturnsAsync(Result.Failure(new Exception("Failed to save payment to the database")));
         var sut = GetClassUnderTest();
 
         // Act
         var result = await sut.ExecuteAsync(payment, cancellationToken);
 
         // Assert
-        result.Should().BeEquivalentTo(Result<Payment>.Failure("Failed to save payment to the database"));
+        result.Should().BeEquivalentTo(Result<Payment>.Failure(new Exception("Failed to save payment to the database")));
     }
 
     [Fact]
     public async Task ExecuteAsync_WhenAllSucceeds_ShouldReturnSuccessResult()
     {
         // Arrange
-        var payment = _fixture.Build<Payment>()
-            .Without(x => x.Card)
-            .Create();
+        var payment = _fixture.CreateValidPayment();
         var cancellationToken = new CancellationToken();
         _riskCheckServiceMock
             .Setup(x => x.CheckAsync(payment, cancellationToken))
+            .ReturnsAsync(Result.Success());
+        _transactionsRepositoryMock
+            .Setup(x => x.AddAsync(payment, cancellationToken))
             .ReturnsAsync(Result.Success());
         _dataProtectionProviderMock
             .Setup(x => x.CreateProtector($"Payment:{payment.Id}"))
@@ -88,9 +79,6 @@ public class PaymentServiceTest
         _dataProtectorMock
             .Setup(x => x.Protect(It.IsAny<byte[]>()))
             .Returns(Encoding.UTF8.GetBytes("encryptedPayment"));
-        _transactionsRepositoryMock
-            .Setup(x => x.AddAsync(payment, cancellationToken))
-            .ReturnsAsync(Result.Success());
         _topicProducerMock
             .Setup(x => x.Produce(
                 payment.Id.ToString(),

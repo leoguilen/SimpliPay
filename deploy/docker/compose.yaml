@@ -6,6 +6,38 @@ volumes:
   postgres_data:
 
 services:
+  payment-gateway:
+    build:
+      context: ../../src/PaymentGateway
+      dockerfile: Dockerfile
+      args:
+        - DOTNET_VERSION=8.0
+      platforms:
+        - linux/amd64
+      no_cache: true
+    container_name: payment-gateway
+    hostname: payment-gateway
+    restart: on-failure
+    stop_grace_period: 30s
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Database=Server=postgres;Port=5432;Database=SimpliPay;User Id=postgres;Password=postgres;Timeout=15;Pooling=true;MinPoolSize=1;MaxPoolSize=20;ConnectionLifeTime=15;
+      - Kafka__Server=kafka:9092
+      - Kafka__GroupId=payment-gateway-00
+      - Kafka__Topic=events.simplipay.payments
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+    depends_on:
+      - postgres
+      - kafka
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   postgres:
     build:
       context: ./postgres
@@ -15,8 +47,10 @@ services:
     hostname: postgres
     restart: on-failure
     stop_grace_period: 30s
-    env_file:
-      - .env
+    environment:
+      POSTGRES_DB: SimpliPay
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:

@@ -26,6 +26,7 @@ internal class ApiKeyValidation(
     {
         if (memoryCache.TryGetValue(apiKey, out Guid? clientId))
         {
+            httpContextAccessor.HttpContext?.Items.Add("ClientId", clientId);
             return true;
         }
 

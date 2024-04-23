@@ -70,7 +70,7 @@ internal static class ServiceCollectionExtensions
             .AddMemoryCache()
             .AddScoped<IClientContext, ClientContext>()
             .AddScoped<IApiKeyValidation, ApiKeyValidation>()
-            .AddTransient<ApiKeyAuthenticationMiddleware>()
+            .AddScoped<ApiKeyAuthenticationMiddleware>()
             .AddExceptionHandler<GlobalExceptionHandlerMiddleware>()
             .AddRateLimiterServices()
             .AddHealthChecks(configuration)
@@ -83,7 +83,8 @@ internal static class ServiceCollectionExtensions
     {
         return services
             .AddSingleton<IDbConnection>(new NpgsqlConnection(configuration.GetConnectionString("Database")))
-            .AddScoped<ITransactionsRepository, TransactionsRepository>();
+            .AddScoped<ITransactionsRepository, TransactionsRepository>()
+            .AddScoped<IPayablesRepository, PayablesRepository>();
     }
 
     public static IServiceCollection AddMassTransitServices(
@@ -125,7 +126,8 @@ internal static class ServiceCollectionExtensions
     {
         return services
             .AddScoped<IPaymentRiskCheckService, PaymentRiskCheckService>()
-            .AddScoped<IPaymentService, PaymentService>();
+            .AddScoped<IPaymentService, PaymentService>()
+            .AddScoped<IBalanceSummaryService, BalanceSummaryService>();
     }
 
     private static IServiceCollection AddRateLimiterServices(this IServiceCollection services)

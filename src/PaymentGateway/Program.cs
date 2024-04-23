@@ -1,3 +1,5 @@
+using PaymentGateway.Features.Balances.Endpoints;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseConsoleLifetime();
@@ -16,13 +18,13 @@ app.UseWhen(
     configuration: ApplicationBuilderExtensions.UseDevelopmentMiddlewares);
 
 app.UseExceptionHandler();
+app.UseHealthChecksProbes();
 app.UseRateLimiter();
 app.UseMiddleware<ApiKeyAuthenticationMiddleware>();
 
-app.UseHealthChecksProbes();
-
 var v1 = app.MapGroup("/api/v1");
 v1.MapPaymentsEndpoints();
+v1.MapBalancesEndpoints();
 
 await app.RunAsync();
 
