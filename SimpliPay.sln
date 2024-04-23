@@ -15,13 +15,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentGateway.Test", "test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentProcessor.Test", "tests\PaymentProcessor.Test\PaymentProcessor.Test.csproj", "{802484C8-8143-48D6-A89C-3D608DB92C33}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentGateway.Integration.Test", "tests\PaymentGateway.Integration.Test\PaymentGateway.Integration.Test.csproj", "{B20AE2AA-EA00-4D06-A9BA-A3C71BAD1C9B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{64AF57CA-8E99-4B92-B24C-BFE1172A27BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -40,11 +39,19 @@ Global
 		{802484C8-8143-48D6-A89C-3D608DB92C33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{802484C8-8143-48D6-A89C-3D608DB92C33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{802484C8-8143-48D6-A89C-3D608DB92C33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B20AE2AA-EA00-4D06-A9BA-A3C71BAD1C9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B20AE2AA-EA00-4D06-A9BA-A3C71BAD1C9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B20AE2AA-EA00-4D06-A9BA-A3C71BAD1C9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B20AE2AA-EA00-4D06-A9BA-A3C71BAD1C9B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{64AF57CA-8E99-4B92-B24C-BFE1172A27BF} = {37BEE0B6-B52A-4122-B024-F3770E02A25D}
 		{3998B3FF-5547-4B13-A421-A821A1AFD9A1} = {37BEE0B6-B52A-4122-B024-F3770E02A25D}
 		{92A81439-79D8-4448-AE06-D7CB617FA580} = {2A0788CD-EE1F-406F-B17F-BF6AAE3D1DAF}
 		{802484C8-8143-48D6-A89C-3D608DB92C33} = {2A0788CD-EE1F-406F-B17F-BF6AAE3D1DAF}
+		{B20AE2AA-EA00-4D06-A9BA-A3C71BAD1C9B} = {2A0788CD-EE1F-406F-B17F-BF6AAE3D1DAF}
 	EndGlobalSection
 EndGlobal

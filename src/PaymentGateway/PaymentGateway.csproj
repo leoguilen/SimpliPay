@@ -8,9 +8,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.ApplicationStatus" />
+    <PackageReference Include="AspNetCore.HealthChecks.Kafka" />
+    <PackageReference Include="AspNetCore.HealthChecks.Npgsql" />
+    <PackageReference Include="Dapper" />
     <PackageReference Include="FluentValidation" />
+    <PackageReference Include="MassTransit.Kafka" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Npgsql" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+    <_Parameter1>$(AssemblyName).Test</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 
 </Project>

@@ -2,9 +2,12 @@
 CREATE SCHEMA clients;
 CREATE SCHEMA payments;
 
+-- Extensions
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- Tables
 CREATE TABLE clients.clients (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     identification_number VARCHAR(20) NOT NULL,
     email VARCHAR(100) NOT NULL,
@@ -16,7 +19,7 @@ CREATE TABLE clients.clients (
     creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE clients.client_api_keys (
-    client_id INT REFERENCES clients.clients(id),
+    client_id UUID REFERENCES clients.clients(id),
     api_key VARCHAR(100) UNIQUE NOT NULL,
     expiration_date TIMESTAMP NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
@@ -29,7 +32,7 @@ CREATE TABLE payments.payment_methods (
     creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE clients.client_payment_methods (
-    client_id INT REFERENCES clients.clients(id),
+    client_id UUID REFERENCES clients.clients(id),
     payment_method_id INT REFERENCES payments.payment_methods(id),
     fee REAL NOT NULL,
     creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -37,8 +40,8 @@ CREATE TABLE clients.client_payment_methods (
     CONSTRAINT unique_client_payment_method UNIQUE (client_id, payment_method_id)
 );
 CREATE TABLE payments.transactions (
-    id SERIAL PRIMARY KEY,
-    client_id INT REFERENCES clients.clients(id),
+    id UUID PRIMARY KEY,
+    client_id UUID REFERENCES clients.clients(id),
     payment_method_id INT REFERENCES payments.payment_methods(id),
     amount DECIMAL(10,2) NOT NULL,
     currency VARCHAR(3) NOT NULL,
@@ -47,23 +50,22 @@ CREATE TABLE payments.transactions (
     card_holder VARCHAR(100) NOT NULL,
     card_expiry DATE NOT NULL,
     cvv CHAR(3) NOT NULL,
-    status VARCHAR(20) NOT NULL,
     date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE payments.transaction_status (
-    transaction_id INT REFERENCES payments.transactions(id),
-    status VARCHAR(50) NOT NULL,
+    transaction_id UUID REFERENCES payments.transactions(id),
+    status SMALLINT NOT NULL,
     details TEXT,
     timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE payments.payables (
-    id SERIAL PRIMARY KEY,
-    transaction_id INT REFERENCES payments.transactions(id),
-    client_id INT REFERENCES clients.clients(id),
+    id UUID PRIMARY KEY,
+    transaction_id UUID REFERENCES payments.transactions(id),
+    client_id UUID REFERENCES clients.clients(id),
     amount DECIMAL(10,2) NOT NULL,
     currency VARCHAR(3) NOT NULL,
-    status VARCHAR(20) NOT NULL,
+    status SMALLINT NOT NULL,
     payment_date DATE NOT NULL,
     creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -75,6 +77,7 @@ CREATE INDEX idx_client_payment_method ON clients.client_payment_methods (client
 
 -- Seed data
 INSERT INTO clients.clients (
+    id,
     name,
     identification_number,
     email,
@@ -82,10 +85,10 @@ INSERT INTO clients.clients (
     address,
     city,
     state,
-    country,
     postal_code)
 VALUES
     (
+        '875cce09-eb96-4ed2-bab2-728b40cc0a98',
         'César e Teresinha Joalheria ME',
         '61575815000193',
         'cobranca@cesareteresinhajoalheriame.com.br',
@@ -96,6 +99,7 @@ VALUES
         '19063450'
     ),
     (
+        '9612309e-12c4-4b54-b96c-cb925fd77791',
         'Giovanna e Thales Informática Ltda',
         '01888287000109',
         'comunicacoes@giovannaethalesinformaticaltda.com.br',
@@ -106,6 +110,7 @@ VALUES
         '56318255'
     ),
     (
+        '2cb49547-9e34-4a50-8d39-b056d5cc5182',
         'Rita e Simone Adega ME',
         '44772184000183',
         'presidencia@ritaesimoneadegame.com.br',
@@ -116,6 +121,7 @@ VALUES
         '23071651'
     ),
     (
+        'a8b71cf6-7d3d-46f0-908b-0f39abde25fb',
         'Bryan e Helena Esportes Ltda',
         '13726943000148',
         'fiscal@bryanehelenaesportesltda.com.br',
@@ -126,6 +132,7 @@ VALUES
         '88708535'
     ),
     (
+        'aed1eb74-5584-4a9b-a6fb-6729254e5765',
         'Aurora e Luís Filmagens ME',
         '11458305000168',
         'fiscal@auroraeluisfilmagensme.com.br',
@@ -142,27 +149,27 @@ INSERT INTO clients.client_api_keys (
     expiration_date)
 VALUES
     (
-        1,
+        '875cce09-eb96-4ed2-bab2-728b40cc0a98',
         '<!eC8>8nYmKfJnT;B%EJH:J[f{WR5P]o',
         CURRENT_TIMESTAMP + INTERVAL '1 year'
     ),
     (
-        2,
+        '9612309e-12c4-4b54-b96c-cb925fd77791',
         'o56nS@{7Kio?9[Dh:sx*U@g^:Eiu4(I+',
         CURRENT_TIMESTAMP + INTERVAL '1 year'
     ),
     (
-        3,
+        '2cb49547-9e34-4a50-8d39-b056d5cc5182',
         'bmUOa*LOGR]beu8MUDs)+PM5f^3|lqBj',
         CURRENT_TIMESTAMP + INTERVAL '1 year'
     ),
     (
-        4,
+        'a8b71cf6-7d3d-46f0-908b-0f39abde25fb',
         ');3:KT0OF]My$r}W-i,uQI|%o6k6z^X3',
         CURRENT_TIMESTAMP + INTERVAL '1 year'
     ),
     (
-        5,
+        'aed1eb74-5584-4a9b-a6fb-6729254e5765',
         '$Uai9oyi>6e*4L$zDxCQL1X-9A9ABA9l',
         CURRENT_TIMESTAMP + INTERVAL '1 year'
     );
@@ -187,13 +194,13 @@ INSERT INTO clients.client_payment_methods (
     fee
 )
 VALUES
-    (1, 1, 0.05),
-    (1, 2, 0.03),
-    (2, 1, 0.05),
-    (2, 2, 0.03),
-    (3, 1, 0.05),
-    (3, 2, 0.03),
-    (4, 1, 0.05),
-    (4, 2, 0.03),
-    (5, 1, 0.05),
-    (5, 2, 0.03);
+    ('875cce09-eb96-4ed2-bab2-728b40cc0a98', 1, 0.05),
+    ('875cce09-eb96-4ed2-bab2-728b40cc0a98', 2, 0.03),
+    ('9612309e-12c4-4b54-b96c-cb925fd77791', 1, 0.05),
+    ('9612309e-12c4-4b54-b96c-cb925fd77791', 2, 0.03),
+    ('2cb49547-9e34-4a50-8d39-b056d5cc5182', 1, 0.05),
+    ('2cb49547-9e34-4a50-8d39-b056d5cc5182', 2, 0.03),
+    ('a8b71cf6-7d3d-46f0-908b-0f39abde25fb', 1, 0.05),
+    ('a8b71cf6-7d3d-46f0-908b-0f39abde25fb', 2, 0.03),
+    ('aed1eb74-5584-4a9b-a6fb-6729254e5765', 1, 0.05),
+    ('aed1eb74-5584-4a9b-a6fb-6729254e5765', 2, 0.03);

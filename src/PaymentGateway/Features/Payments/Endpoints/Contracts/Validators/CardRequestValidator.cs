@@ -1,4 +1,4 @@
-﻿namespace PaymentGateway;
+﻿namespace PaymentGateway.Features.Payments.Endpoints.Contracts.Validators;
 
 internal sealed class CardRequestValidator : AbstractValidator<CardRequest>
 {

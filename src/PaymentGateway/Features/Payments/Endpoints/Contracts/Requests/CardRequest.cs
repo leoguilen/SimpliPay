@@ -1,4 +1,4 @@
-﻿namespace PaymentGateway.Endpoints.Payments.Contracts.Requests;
+﻿namespace PaymentGateway.Features.Payments.Endpoints.Contracts.Requests;
 
 public record CardRequest(
     string Number,
