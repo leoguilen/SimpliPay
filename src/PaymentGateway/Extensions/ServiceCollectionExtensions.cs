@@ -53,6 +53,7 @@ internal static class ServiceCollectionExtensions
                 }
             });
 
+            options.CustomSchemaIds(type => type.FullName);
             options.SupportNonNullableReferenceTypes();
         });
 

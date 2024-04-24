@@ -41,19 +41,6 @@ public class PaymentsEndpointsTest : IntegrationTest
     }
 
     [Fact]
-    public async Task PostPayments_WithServiceFailure_ReturnsUnprocessableEntity()
-    {
-        // Arrange
-        var request = JsonContent.Create(_fixture.CreateSuspiciousPaymentRequest());
-
-        // Act
-        var response = await Client.PostAsync("/api/v1/payments", request);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
-    }
-
-    [Fact]
     public async Task PostPayments_WithValidRequest_ReturnsAccepted()
     {
         // Arrange

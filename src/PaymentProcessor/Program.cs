@@ -19,6 +19,11 @@ builder.Services.AddMassTransit(config =>
                 e.AutoOffsetReset = AutoOffsetReset.Earliest;
                 e.ConcurrentConsumerLimit = 10;
 
+                e.CreateIfMissing(c =>
+                {
+                    c.NumPartitions = 1;
+                    c.ReplicationFactor = 1;
+                });
                 e.ConfigureConsumer<PaymentReceivedEventConsumer>(context);
             });
         });
