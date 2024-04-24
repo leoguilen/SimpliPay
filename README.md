@@ -1,6 +1,10 @@
 # SimpliPay 💳💸
 SimpliPay is a simplified payment service provider (PSP) that facilitates electronic payment transactions between various parties, such as customers, companies and banks. It provides credit card and debit card payments.
 
+## Services
+- Payment Gateway API: A RESTful API that allows customers to make payments using credit or debit cards.
+- Payment Processor Worker: A message queue that processes payments asynchronously.
+
 ## Features
 - HTTP API interface
 - Topic-based message queue for processing payments
