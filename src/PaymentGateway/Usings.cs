@@ -5,10 +5,6 @@ global using MassTransit;
 global using Npgsql;
 
 global using HealthChecks.ApplicationStatus.DependencyInjection;
-
-global using Microsoft.AspNetCore.DataProtection;
-global using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
-global using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 global using Microsoft.AspNetCore.Diagnostics;
 global using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 global using Microsoft.AspNetCore.Mvc;
@@ -20,11 +16,11 @@ global using System.Data;
 global using System.Diagnostics;
 global using System.Diagnostics.CodeAnalysis;
 global using System.Net.Mime;
-global using System.Text;
 global using System.Text.Json;
 global using System.Globalization;
 global using System.Threading.RateLimiting;
 
+global using PaymentGateway.Features.Payments.Events;
 global using PaymentGateway.Features.Payments.Repositories;
 global using PaymentGateway.Features.Payments.Repositories.Impl;
 global using PaymentGateway.Contexts;

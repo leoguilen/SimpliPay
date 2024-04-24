@@ -1,7 +1,30 @@
-using PaymentProcessor;
-
 var builder = Host.CreateApplicationBuilder(args);
-builder.Services.AddHostedService<Worker>();
+
+builder.Services.AddRepositories(builder.Configuration);
+builder.Services.AddServices();
+builder.Services.AddMassTransit(config =>
+{
+    config.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context));
+
+    config.AddRider(rider =>
+    {
+        rider.AddConsumer<PaymentReceivedEventConsumer>();
+        rider.UsingKafka((context, k) =>
+        {
+            var kafkaConfiguration = builder.Configuration.GetRequiredSection("Kafka");
+
+            k.Host(kafkaConfiguration["Server"]);
+            k.TopicEndpoint<string, PaymentReceivedEvent>(kafkaConfiguration["TopicName"], kafkaConfiguration["GroupId"], e =>
+            {
+                e.AutoOffsetReset = AutoOffsetReset.Earliest;
+                e.ConcurrentConsumerLimit = 10;
+
+                e.ConfigureConsumer<PaymentReceivedEventConsumer>(context);
+            });
+        });
+    });
+});
 
 var host = builder.Build();
-host.Run();
+
+await host.RunAsync();

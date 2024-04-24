@@ -1,9 +1,11 @@
-﻿namespace PaymentGateway.Features.Payments.Services.Impl;
+﻿using Client = PaymentGateway.Features.Payments.Models.Client;
+
+namespace PaymentGateway.Features.Payments.Services.Impl;
 
 internal sealed class PaymentService(
+    IClientContext clientContext,
     IPaymentRiskCheckService riskCheckService,
-    IDataProtectionProvider dataProtectionProvider,
-    ITopicProducer<string, PaymentReceived> topicProducer,
+    ITopicProducer<string, PaymentReceivedEvent> topicProducer,
     ITransactionsRepository transactionsRepository,
     ILogger<PaymentService> logger)
     : IPaymentService
@@ -20,6 +22,14 @@ internal sealed class PaymentService(
         }
 
         ObuscateCardNumber(ref payment);
+        payment = payment with
+        {
+            Client = new Client()
+            {
+                Id = clientContext.ClientId,
+                Name = string.Empty,
+            }
+        };
 
         var result = await transactionsRepository.AddAsync(payment, cancellationToken);
         if (!result.IsSuccess)
@@ -28,12 +38,9 @@ internal sealed class PaymentService(
             return Result<Payment>.Failure(result.Exception!);
         }
 
-        var protector = dataProtectionProvider.CreateProtector($"Payment:{payment.Id}");
-        var encryptedPayment = Encoding.UTF8.GetString(protector.Protect(JsonSerializer.SerializeToUtf8Bytes(payment)));
-
         await topicProducer.Produce(
             key: payment.Id.ToString(),
-            value: new PaymentReceived(encryptedPayment),
+            value: new PaymentReceivedEvent(payment),
             cancellationToken);
 
         logger.LogInformation("Payment {PaymentId} has been successfully transmitted", payment.Id);

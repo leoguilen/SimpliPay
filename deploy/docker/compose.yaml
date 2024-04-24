@@ -37,6 +37,31 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  
+  payment-processor:
+    build:
+      context: ../../src/PaymentProcessor
+      dockerfile: Dockerfile
+      args:
+        - DOTNET_VERSION=8.0
+      platforms:
+        - linux/amd64
+      no_cache: true
+    container_name: payment-processor
+    hostname: payment-processor
+    restart: on-failure
+    stop_grace_period: 30s
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - ConnectionStrings__Database=Server=postgres;Port=5432;Database=SimpliPay;User Id=postgres;Password=postgres;Timeout=15;Pooling=true;MinPoolSize=1;MaxPoolSize=20;ConnectionLifeTime=15;
+      - Kafka__Server=kafka:9092
+      - Kafka__GroupId=payment-processor-00
+      - Kafka__Topic=events.simplipay.payments
+    networks:
+      - backend
+    depends_on:
+      - postgres
+      - kafka
 
   postgres:
     build:

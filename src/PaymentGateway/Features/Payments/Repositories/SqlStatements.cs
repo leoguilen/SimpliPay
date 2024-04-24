@@ -57,8 +57,14 @@ internal static class SqlStatements
             t.card_number AS ""CardNumber"",
             t.date AS ""Date"",
             ts.status AS ""Status""
-        FROM payments.transaction_status ts
-        JOIN payments.transactions t ON t.id = ts.transaction_id
+        FROM payments.transactions t
+        JOIN LATERAL (
+            SELECT *
+            FROM payments.transaction_status
+            WHERE transaction_id = t.id
+            ORDER BY timestamp DESC
+            LIMIT 1
+        ) ts ON TRUE
         JOIN payments.payment_methods pm ON pm.id = t.payment_method_id
         JOIN clients.clients c ON c.id = t.client_id
         WHERE t.client_id = @ClientId

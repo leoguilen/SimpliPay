@@ -1,4 +1,6 @@
-﻿namespace PaymentGateway.Test.Fixtures;
+﻿using Client = PaymentGateway.Features.Payments.Models.Client;
+
+namespace PaymentGateway.Test.Fixtures;
 
 internal class PaymentFixture : Fixture
 {
@@ -13,6 +15,7 @@ internal class PaymentFixture : Fixture
     {
         return Build<Payment>()
             .With(x => x.Id, _faker.Random.Uuid())
+            .With(x => x.Client, new Client() { Id = _faker.Random.Uuid(), Name = string.Empty })
             .With(x => x.Amount, _faker.Finance.Amount(min: 1))
             .With(x => x.Currency, _faker.Finance.Currency().Code)
             .With(x => x.Card, new Card()

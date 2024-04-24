@@ -65,7 +65,6 @@ internal static class ServiceCollectionExtensions
     {
         return services
             .AddProblemDetails()
-            .AddDataProtectionServices()
             .AddHttpContextAccessor()
             .AddMemoryCache()
             .AddScoped<IClientContext, ClientContext>()
@@ -96,14 +95,14 @@ internal static class ServiceCollectionExtensions
             cfg.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context));
             cfg.AddRider(cfg =>
             {
-                cfg.AddProducer<string, PaymentReceived>("events.simplipay.payments");
+                cfg.AddProducer<string, PaymentReceivedEvent>("events.simplipay.payments");
                 cfg.UsingKafka((context, cfg) =>
                 {
                     var kafkaConfiguration = configuration.GetRequiredSection("Kafka");
 
                     cfg.Host(kafkaConfiguration["Server"]);
 
-                    cfg.TopicEndpoint<string, PaymentReceived>(
+                    cfg.TopicEndpoint<string, PaymentReceivedEvent>(
                         kafkaConfiguration["TopicName"],
                         kafkaConfiguration["GroupId"],
                         c =>
@@ -204,21 +203,6 @@ internal static class ServiceCollectionExtensions
                 tags: ["kafka", "ready"],
                 timeout: TimeSpan.FromSeconds(5)
             )
-            .Services;
-    }
-
-    private static IServiceCollection AddDataProtectionServices(this IServiceCollection services)
-    {
-        return services
-            .AddDataProtection()
-            .SetApplicationName("PaymentGateway")
-            .SetDefaultKeyLifetime(TimeSpan.FromDays(7))
-            // .ProtectKeysWithCertificate()
-            .UseCryptographicAlgorithms(new AuthenticatedEncryptorConfiguration()
-            {
-                EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
-                ValidationAlgorithm = ValidationAlgorithm.HMACSHA256,
-            })
             .Services;
     }
 

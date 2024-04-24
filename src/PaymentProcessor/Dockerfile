@@ -9,7 +9,7 @@ WORKDIR /source
 COPY . .
 RUN dotnet publish -c Release -o /app -a ${TARGETARCH/amd64/x64} --os $TARGETOS
 
-FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION}-alpine AS final
+FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/runtime:${DOTNET_VERSION}-alpine AS runtime
 WORKDIR /app
 COPY --from=build /app/ .
-ENTRYPOINT ["dotnet", "PaymentGateway.dll"]
+ENTRYPOINT ["dotnet", "PaymentProcessor.dll"]
